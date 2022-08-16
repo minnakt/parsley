@@ -17,11 +17,22 @@
     "test": "jest --watchAll=false"
   },
   "dependencies": {
+    "@emotion/react": "11.9.3",
+    "@emotion/styled": "11.9.3",
+    "@leafygreen-ui/button": "16.0.0",
+    "@leafygreen-ui/emotion": "^4.0.0",
+    "@leafygreen-ui/leafygreen-provider": "2.3.2",
+    "@leafygreen-ui/palette": "3.4.0",
+    "@leafygreen-ui/select": "7.0.0",
+    "@leafygreen-ui/text-input": "10.1.0",
+    "@leafygreen-ui/toggle": "8.0.2",
+    "@leafygreen-ui/typography": "13.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.3.0"
   },
   "devDependencies": {
+    "@emotion/eslint-plugin": "11.10.0",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.3.0",
     "@testing-library/react-hooks": "8.0.1",
@@ -32,7 +43,7 @@
     "@types/react-dom": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "5.33.0",
     "@typescript-eslint/parser": "5.33.0",
-    "@vitejs/plugin-react": "^2.0.0",
+    "@vitejs/plugin-react": "2.0.1",
     "eslint": "8.21.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-prettier": "8.5.0",
