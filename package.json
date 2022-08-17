@@ -20,7 +20,7 @@
     "@emotion/react": "11.9.3",
     "@emotion/styled": "11.9.3",
     "@leafygreen-ui/button": "16.0.0",
-    "@leafygreen-ui/emotion": "^4.0.0",
+    "@leafygreen-ui/emotion": "4.0.0",
     "@leafygreen-ui/leafygreen-provider": "2.3.2",
     "@leafygreen-ui/palette": "3.4.0",
     "@leafygreen-ui/select": "7.0.0",
@@ -32,6 +32,7 @@
     "react-router-dom": "6.3.0"
   },
   "devDependencies": {
+    "@emotion/babel-plugin": "11.10.0",
     "@emotion/eslint-plugin": "11.10.0",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.3.0",

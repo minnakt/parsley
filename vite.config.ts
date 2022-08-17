@@ -21,6 +21,12 @@ export default defineConfig({
     tsconfigPaths(),
     react({
       jsxImportSource: "@emotion/react", // This enables use of css prop on JSX.
+      babel: {
+        // @emotion/babel-plugin injects styled component names (e.g. "StyledSelect") into HTML for dev environments
+        // only. It can be toggled for production environments by modifying the parameter autoLabel.
+        // (https://emotion.sh/docs/@emotion/babel-plugin)
+        plugins: ["@emotion/babel-plugin"],
+      },
       exclude: /\.stories\.tsx?$/, // Exclude storybook stories from fast refresh.
       include: ["**/*.tsx", "**/*.ts"], // Only Typescript files should use fast refresh.
       fastRefresh: true,
