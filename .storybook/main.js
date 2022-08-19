@@ -1,3 +1,6 @@
+const { loadConfigFromFile } = require("vite");
+const path = require("path");
+
 module.exports = {
   stories: ["../src/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
@@ -29,17 +32,16 @@ module.exports = {
     },
   },
   async viteFinal(config, { configType }) {
-    const resolve = {
-      alias: {
-        "@leafygreen-ui/emotion": "./config/leafygreen-ui/emotion.ts",
-      },
-    };
+    const { config: viteConfig } = await loadConfigFromFile(
+      configType,
+      path.resolve(__dirname, "../vite.config.ts")
+    );
 
     if (configType === "PRODUCTION") {
       // We need to override the 'base' property so that the path to storybook-static/assets
       // is correct. (https://github.com/storybookjs/builder-vite/issues/475)
-      return { ...config, resolve, base: "./" };
+      return { ...config, resolve: viteConfig.resolve, base: "./" };
     }
-    return { ...config, resolve };
+    return { ...config, resolve: viteConfig.resolve };
   },
 };
