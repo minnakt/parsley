@@ -2,10 +2,9 @@ import { useState } from "react";
 import styled from "@emotion/styled";
 import FiltersDrawer from "components/FiltersDrawer";
 import LogPane from "components/LogPane";
-import { RowRenderer, cache } from "components/LogRow/RowRenderer";
 import SideBar from "components/SideBar";
 import SubHeader from "components/SubHeader";
-import { FilterLogic, LogTypes } from "constants/enums";
+import { LogTypes } from "constants/enums";
 import { QueryParams } from "constants/queryParams";
 import { useLogContext } from "context/LogContext";
 import { useQueryParam } from "hooks/useQueryParam";
@@ -18,23 +17,14 @@ interface LogWindowProps {
 const LogWindow: React.FC<LogWindowProps> = ({ logType, isUploadedLog }) => {
   const {
     collapseLines,
-    expandLines,
-    getLine,
     scrollToLine,
     expandedLines,
     hasLogs,
-    highlightedLine,
     lineCount,
     processedLogLines,
-    range,
-    searchState,
   } = useLogContext();
+
   const [wrap] = useQueryParam(QueryParams.Wrap, false);
-  const [filters] = useQueryParam<string[]>(QueryParams.Filters, []);
-  const [filterLogic] = useQueryParam(QueryParams.FilterLogic, FilterLogic.And);
-
-  const { searchTerm } = searchState;
-
   const [selectedLine] = useQueryParam<number | undefined>(
     QueryParams.SelectedLine,
     undefined
@@ -62,23 +52,9 @@ const LogWindow: React.FC<LogWindowProps> = ({ logType, isUploadedLog }) => {
         <SubHeader isUploadedLog={isUploadedLog} />
         <LogPaneContainer>
           <LogPane
-            cache={cache}
-            expandedLines={expandedLines}
-            filterLogic={filterLogic}
-            filters={filters}
             initialScrollIndex={initialScrollIndex}
+            logType={logType}
             rowCount={processedLogLines.length}
-            rowRenderer={RowRenderer({
-              expandLines,
-              getLine,
-              scrollToLine,
-              highlightedLine,
-              logType,
-              processedLines: processedLogLines,
-              range,
-              searchTerm,
-              wrap,
-            })}
             wrap={wrap}
           />
         </LogPaneContainer>

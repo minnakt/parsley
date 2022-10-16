@@ -1,40 +1,42 @@
-import { forwardRef } from "react";
 import BaseRow from "components/LogRow/BaseRow";
-import { BaseRowProps } from "../types";
+import { useLogContext } from "context/LogContext";
 import { isLineInRange } from "../utils";
 
-const ResmokeRow = forwardRef<any, BaseRowProps>((rowProps, ref) => {
-  const { data, listRowProps } = rowProps;
+interface ResmokeRowProps {
+  index: number;
+  wrap: boolean;
+}
+
+const ResmokeRow: React.FC<ResmokeRowProps> = ({ index, wrap }) => {
   const {
     getLine,
-    wrap,
-    processedLines,
+    processedLogLines,
+    searchState,
     range,
-    searchTerm,
     highlightedLine,
     scrollToLine,
-  } = data;
-  const { index } = listRowProps;
+  } = useLogContext();
 
-  const line = processedLines[index] as number;
+  const { searchTerm } = searchState;
+
+  const line = processedLogLines[index] as number;
   const lineContent = getLine(line);
   const inRange = isLineInRange(range, line);
 
   return lineContent ? (
     <BaseRow
-      wrap={wrap}
-      {...listRowProps}
-      ref={ref}
       data-cy-text="resmoke-row"
       highlightedLine={highlightedLine}
+      index={index}
       lineNumber={line}
       scrollToLine={scrollToLine}
       searchTerm={inRange ? searchTerm : undefined}
+      wrap={wrap}
     >
       {lineContent}
     </BaseRow>
   ) : null;
-});
+};
 
 ResmokeRow.displayName = "ResmokeRow";
 

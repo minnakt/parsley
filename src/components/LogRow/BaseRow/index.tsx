@@ -1,7 +1,6 @@
-import { forwardRef, useMemo } from "react";
+import { useMemo } from "react";
 import styled from "@emotion/styled";
 import { palette } from "@leafygreen-ui/palette";
-import { ListRowProps } from "react-virtualized";
 import Highlight from "components/Highlight";
 import Icon from "components/Icon";
 import { QueryParams } from "constants/queryParams";
@@ -11,7 +10,7 @@ import renderHtml from "utils/renderHtml";
 
 const { yellow, red } = palette;
 
-interface BaseRowProps extends ListRowProps {
+interface BaseRowProps {
   children: string;
   index: number;
   wrap: boolean;
@@ -28,20 +27,16 @@ interface BaseRowProps extends ListRowProps {
  * BaseRow is meant to be used as a wrapper for all rows in the log view.
  * It is responsible for handling the highlighting of the selected line
  */
-const BaseRow = forwardRef<any, BaseRowProps>((props, ref) => {
-  const {
-    index,
-    lineNumber,
-    children,
-    wrap,
-    isVisible,
-    highlightedLine,
-    scrollToLine,
-    searchTerm,
-    "data-cy-text": dataCyText,
-    ...rest
-  } = props;
-
+const BaseRow: React.FC<BaseRowProps> = ({
+  index,
+  wrap,
+  children,
+  lineNumber,
+  highlightedLine,
+  scrollToLine,
+  searchTerm,
+  "data-cy-text": dataCyText,
+}) => {
   const [selectedLine, setSelectedLine] = useQueryParam<number | undefined>(
     QueryParams.SelectedLine,
     undefined
@@ -78,8 +73,6 @@ const BaseRow = forwardRef<any, BaseRowProps>((props, ref) => {
 
   return (
     <StyledPre
-      {...rest}
-      ref={ref}
       bookmarked={bookmarked}
       data-cy={`log-row-${lineNumber}`}
       data-highlighted={isHighlighted}
@@ -101,7 +94,7 @@ const BaseRow = forwardRef<any, BaseRowProps>((props, ref) => {
       </ProcessedBaseRow>
     </StyledPre>
   );
-});
+};
 
 interface ProcessedBaseRowProps {
   children: string;
@@ -151,12 +144,11 @@ const StyledPre = styled.pre<{
   bookmarked: boolean;
   highlighted: boolean;
 }>`
-  overflow-y: hidden;
   margin-top: 0;
   margin-bottom: 0;
   margin-right: ${size.xs};
   font-size: ${fontSize.m};
-  width: unset !important;
+  width: fit-content;
   ${({ shouldWrap }) =>
     shouldWrap &&
     `

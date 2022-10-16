@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useRef } from "react";
-import { List } from "react-virtualized";
+import { VirtuosoHandle } from "react-virtuoso";
 import { FilterLogic, LogTypes } from "constants/enums";
 import { QueryParams } from "constants/queryParams";
 import { useQueryParam } from "hooks/useQueryParam";
@@ -16,7 +16,7 @@ interface LogContextState {
   hasLogs: boolean;
   highlightedLine?: number;
   lineCount: number;
-  listRef: React.RefObject<List>;
+  listRef: React.RefObject<VirtuosoHandle>;
   processedLogLines: ProcessedLogLines;
   range: {
     lowerRange: number;
@@ -69,22 +69,13 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
   const [lowerRange] = useQueryParam(QueryParams.LowerRange, 0);
   const [expandableRows] = useQueryParam(QueryParams.Expandable, false);
   const { state, dispatch } = useLogState(initialLogLines);
-  const listRef = useRef<List>(null);
+  const listRef = useRef<VirtuosoHandle>(null);
 
   const getLine = useCallback(
     (lineNumber: number) => state.logs[lineNumber],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.logs.length]
   );
-
-  const scrollToLine = useCallback((lineNumber: number) => {
-    // We need to call scrollToRow twice because of https://github.com/bvaughn/react-virtualized/issues/995.
-    // When we switch to a different virtual list library we should not do this.
-    listRef.current?.scrollToRow(lineNumber);
-    setTimeout(() => {
-      listRef.current?.scrollToRow(lineNumber);
-    }, 0);
-  }, []);
 
   // TODO EVG-17537: more advanced filtering
   const processedLogLines = useMemo(
@@ -168,10 +159,11 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
         if (searchIndex !== undefined && searchRange !== undefined) {
           const nextPage = getNextPage(searchIndex, searchRange, direction);
           dispatch({ type: "PAGINATE", nextPage });
-          scrollToLine(searchResults[nextPage]);
+          listRef.current?.scrollToIndex(searchResults[nextPage]);
         }
       },
-      scrollToLine,
+      scrollToLine: (lineNumber: number) =>
+        listRef.current?.scrollToIndex(lineNumber),
       setCaseSensitive: (caseSensitive: boolean) => {
         dispatch({ type: "SET_CASE_SENSITIVE", caseSensitive });
       },
@@ -194,7 +186,6 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
       upperRange,
       dispatch,
       getLine,
-      scrollToLine,
     ]
   );
 
