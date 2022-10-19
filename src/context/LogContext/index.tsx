@@ -1,4 +1,13 @@
-import { createContext, useCallback, useContext, useMemo, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { VirtuosoHandle } from "react-virtuoso";
 import { FilterLogic, LogTypes } from "constants/enums";
 import { QueryParams } from "constants/queryParams";
@@ -77,29 +86,39 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
     [state.logs.length]
   );
 
-  // TODO EVG-17537: more advanced filtering
-  const processedLogLines = useMemo(
-    () =>
+  const [processedLogLines, setProcessedLogLines] = useState<ProcessedLogLines>(
+    []
+  );
+  const deferredFilters = useDeferredValue(filters);
+  const deferredBookmarks = useDeferredValue(bookmarks);
+  const deferredSelectedLine = useDeferredValue(selectedLine);
+  const deferredFilterLogic = useDeferredValue(filterLogic);
+  const deferredExpandedLines = useDeferredValue(state.expandedLines);
+  const deferredExpandableRows = useDeferredValue(expandableRows);
+
+  useEffect(() => {
+    setProcessedLogLines(
       filterLogs({
         logLines: state.logs,
-        filters,
-        bookmarks,
-        selectedLine,
-        filterLogic,
-        expandedLines: state.expandedLines,
-        expandableRows,
-      }),
+        filters: deferredFilters,
+        bookmarks: deferredBookmarks,
+        selectedLine: deferredSelectedLine,
+        filterLogic: deferredFilterLogic,
+        expandedLines: deferredExpandedLines,
+        expandableRows: deferredExpandableRows,
+      })
+    );
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      state.logs.length,
-      `${filters}`, // eslint-disable-line react-hooks/exhaustive-deps
-      `${bookmarks}`, // eslint-disable-line react-hooks/exhaustive-deps
-      `${state.expandedLines}`, // eslint-disable-line react-hooks/exhaustive-deps
-      selectedLine,
-      filterLogic,
-      expandableRows,
-    ]
-  );
+  }, [
+    state.logs.length,
+    `${deferredFilters}`,
+    `${deferredBookmarks}`,
+    deferredSelectedLine,
+    deferredFilterLogic,
+    `${deferredExpandedLines}`,
+    deferredExpandableRows,
+  ]);
 
   const searchResults = useMemo(() => {
     const results = state.searchState.searchTerm

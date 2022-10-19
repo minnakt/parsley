@@ -42,6 +42,13 @@ export const filterLogs = ({
 
   const filteredLines: ProcessedLogLines = [];
 
+  const regexFilter =
+    filterLogic === FilterLogic.And
+      ? filters.map((f) => `(?=^.*${f})`).join("")
+      : filters.join("|");
+
+  const regexToMatch = new RegExp(regexFilter, "i");
+
   logLines.reduce((arr, logLine, idx) => {
     // Bookmarks and selected lines should always remain uncollapsed.
     if (
@@ -54,7 +61,7 @@ export const filterLogs = ({
     }
 
     // If the line matches the filters, it should remain uncollapsed.
-    if (matchesFilter(logLine, filters, filterLogic)) {
+    if (matchesFilter(logLine, regexToMatch)) {
       arr.push(idx);
       return arr;
     }
@@ -79,15 +86,5 @@ export const filterLogs = ({
  * @param filterLogic - specifies whether to use AND or OR filtering
  * @returns true if filter conditions are satisfied, false otherwise
  */
-export const matchesFilter = (
-  logLine: string,
-  filters: string[],
-  filterLogic: FilterLogic
-) => {
-  const regexFilter =
-    filterLogic === FilterLogic.And
-      ? filters.map((f) => `(?=^.*${f})`).join("")
-      : filters.join("|");
-
-  return new RegExp(regexFilter, "i").test(logLine);
-};
+export const matchesFilter = (logLine: string, regexToMatch: RegExp) =>
+  logLine.match(regexToMatch);
