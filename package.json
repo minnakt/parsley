@@ -92,7 +92,7 @@
     "@types/react-virtualized": "^9.21.21",
     "@typescript-eslint/eslint-plugin": "5.38.1",
     "@typescript-eslint/parser": "5.33.0",
-    "@vitejs/plugin-react": "2.0.1",
+    "@vitejs/plugin-react": "2.2.0",
     "babel-loader": "^8.2.5",
     "cypress": "10.9.0",
     "env-cmd": "^10.1.0",
