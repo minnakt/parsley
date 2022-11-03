@@ -1,28 +1,29 @@
-import { forwardRef } from "react";
 import AnsiUp from "ansi_up";
 import linkifyHtml from "linkify-html";
 import BaseRow from "components/LogRow/BaseRow";
-import { BaseRowProps } from "../types";
+
+import { useLogContext } from "context/LogContext";
 import { isLineInRange } from "../utils";
 
 const ansiUp = new AnsiUp();
 
-interface AnsiiRowProps extends BaseRowProps {
+interface AnsiiRowProps {
+  index: number;
+  wrap: boolean;
   lineNumber: number;
+  highlights: RegExp;
 }
 
-const AnsiiRow = forwardRef<any, AnsiiRowProps>((rowProps, ref) => {
-  const { data, listRowProps, lineNumber } = rowProps;
-  const {
-    getLine,
-    resetRowHeightAtIndex,
-    scrollToLine,
-    highlightedLine,
-    range,
-    searchTerm,
-    wrap,
-    highlights,
-  } = data;
+const AnsiiRow: React.FC<AnsiiRowProps> = ({
+  index,
+  wrap,
+  lineNumber,
+  highlights,
+}) => {
+  const { getLine, scrollToLine, highlightedLine, range, searchState } =
+    useLogContext();
+
+  const { searchTerm } = searchState;
 
   const lineContent = getLine(lineNumber) || "";
   const linkifiedLine = linkifyHtml(ansiUp.ansi_to_html(lineContent), {
@@ -34,13 +35,11 @@ const AnsiiRow = forwardRef<any, AnsiiRowProps>((rowProps, ref) => {
 
   return lineContent ? (
     <BaseRow
-      {...listRowProps}
-      ref={ref}
       data-cy="ansii-row"
       highlightedLine={highlightedLine}
       highlights={highlights}
+      index={index}
       lineNumber={lineNumber}
-      resetRowHeightAtIndex={resetRowHeightAtIndex}
       scrollToLine={scrollToLine}
       searchTerm={inRange ? searchTerm : undefined}
       wrap={wrap}
@@ -48,7 +47,7 @@ const AnsiiRow = forwardRef<any, AnsiiRowProps>((rowProps, ref) => {
       {linkifiedLine}
     </BaseRow>
   ) : null;
-});
+};
 
 AnsiiRow.displayName = "AnsiiRow";
 

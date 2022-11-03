@@ -2,7 +2,6 @@ import { useState } from "react";
 import styled from "@emotion/styled";
 import FiltersDrawer from "components/FiltersDrawer";
 import LogPane from "components/LogPane";
-import { RowRenderer, cache } from "components/LogRow/RowRenderer";
 import SideBar from "components/SideBar";
 import SubHeader from "components/SubHeader";
 import { LogTypes } from "constants/enums";
@@ -19,23 +18,12 @@ const LogWindow: React.FC<LogWindowProps> = ({ logType, isUploadedLog }) => {
   const {
     clearExpandedLines,
     collapseLines,
-    expandLines,
-    getLine,
-    getResmokeLineColor,
-    resetRowHeightAtIndex,
     scrollToLine,
-
     expandedLines,
     hasLogs,
-    highlightedLine,
     lineCount,
-    prettyPrint,
     processedLogLines,
-    range,
-    searchState,
   } = useLogContext();
-
-  const { searchTerm } = searchState;
 
   const [wrap] = useQueryParam(QueryParams.Wrap, false);
   const [selectedLine] = useQueryParam<number | undefined>(
@@ -46,7 +34,7 @@ const LogWindow: React.FC<LogWindowProps> = ({ logType, isUploadedLog }) => {
 
   const highlightRegex = highlights.length
     ? new RegExp(highlights.join("|"), "i")
-    : undefined;
+    : /^b$/;
 
   const [initialScrollIndex] = useState(
     findLineIndex(processedLogLines, selectedLine)
@@ -72,26 +60,10 @@ const LogWindow: React.FC<LogWindowProps> = ({ logType, isUploadedLog }) => {
         <SubHeader isUploadedLog={isUploadedLog} />
         <LogPaneContainer>
           <LogPane
-            cache={cache}
+            highlightRegex={highlightRegex}
             initialScrollIndex={initialScrollIndex}
+            logType={logType}
             rowCount={processedLogLines.length}
-            rowRenderer={RowRenderer({
-              data: {
-                expandLines,
-                getLine,
-                getResmokeLineColor,
-                resetRowHeightAtIndex,
-                scrollToLine,
-                highlightedLine,
-                highlights: highlightRegex,
-                prettyPrint,
-                range,
-                searchTerm,
-                wrap,
-              },
-              processedLogLines,
-              logType,
-            })}
             wrap={wrap}
           />
         </LogPaneContainer>

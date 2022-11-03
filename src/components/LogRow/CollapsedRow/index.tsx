@@ -1,24 +1,23 @@
-import { forwardRef, useTransition } from "react";
+import { useTransition } from "react";
 import styled from "@emotion/styled";
 import Button from "@leafygreen-ui/button";
 import { palette } from "@leafygreen-ui/palette";
 import { Overline } from "@leafygreen-ui/typography";
 import Icon from "components/Icon";
 import { size } from "constants/tokens";
+import { useLogContext } from "context/LogContext";
 import { OverlineType } from "types/leafygreen";
-import { BaseRowProps } from "../types";
 
 const { gray, black } = palette;
 
 const SKIP_NUMBER = 5;
 
-interface CollapsedRowProps extends BaseRowProps {
+interface CollapsedRowProps {
   collapsedLines: number[];
 }
 
-const CollapsedRow = forwardRef<any, CollapsedRowProps>((props, ref) => {
-  const { collapsedLines, data, listRowProps } = props;
-  const { expandLines } = data;
+const CollapsedRow: React.FC<CollapsedRowProps> = ({ collapsedLines }) => {
+  const { expandLines } = useLogContext();
 
   const numCollapsed = collapsedLines.length;
   const start = collapsedLines[0];
@@ -46,11 +45,7 @@ const CollapsedRow = forwardRef<any, CollapsedRowProps>((props, ref) => {
   };
 
   return (
-    <CollapsedLineWrapper
-      {...listRowProps}
-      ref={ref}
-      data-cy={`collapsed-row-${start}-${end}`}
-    >
+    <CollapsedLineWrapper data-cy={`collapsed-row-${start}-${end}`}>
       <StyledOverline>{lineText}</StyledOverline>
       <StyledButton
         leftGlyph={<Icon glyph="Expand" />}
@@ -72,7 +67,7 @@ const CollapsedRow = forwardRef<any, CollapsedRowProps>((props, ref) => {
       </StyledButton>
     </CollapsedLineWrapper>
   );
-});
+};
 
 CollapsedRow.displayName = "CollapsedRow";
 

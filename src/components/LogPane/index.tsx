@@ -1,63 +1,64 @@
-import { useEffect } from "react";
-import {
-  AutoSizer,
-  CellMeasurerCache,
-  List,
-  ListProps,
-  ListRowRenderer,
-} from "react-virtualized";
-import { QueryParams } from "constants/queryParams";
+import styled from "@emotion/styled";
+import { Virtuoso } from "react-virtuoso";
+import AnsiiRow from "components/LogRow/AnsiiRow";
+import CollapsedRow from "components/LogRow/CollapsedRow";
+import ResmokeRow from "components/LogRow/ResmokeRow";
+import { LogTypes } from "constants/enums";
 import { useLogContext } from "context/LogContext";
-import { useQueryParam } from "hooks/useQueryParam";
+import { isCollapsedRow } from "utils/collapsedRow";
 
-type LogPaneProps = Omit<
-  ListProps,
-  "height" | "width" | "itemData" | "rowHeight"
-> & {
-  cache: CellMeasurerCache;
+interface LogPaneProps {
+  highlightRegex: RegExp;
   initialScrollIndex: number;
-  rowRenderer: ListRowRenderer;
+  logType: LogTypes;
+  rowCount: number;
   wrap: boolean;
-};
+}
 
 const LogPane: React.FC<LogPaneProps> = ({
-  cache,
-  rowRenderer,
-  rowCount,
+  highlightRegex,
   initialScrollIndex,
+  logType,
+  rowCount,
   wrap,
-  ...rest
 }) => {
-  const { listRef, matchingLines, prettyPrint } = useLogContext();
-
-  const [expandableRows] = useQueryParam(QueryParams.Expandable, true);
-
-  useEffect(() => {
-    cache.clearAll();
-    listRef.current?.recomputeRowHeights();
-  }, [listRef, cache, wrap, matchingLines, expandableRows, prettyPrint]);
+  const { listRef, processedLogLines } = useLogContext();
 
   return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <List
-          ref={listRef}
-          cache={cache}
-          containerStyle={{ overflow: "scroll visible" }}
-          deferredMeasurementCache={cache}
-          height={height}
-          overscanRowCount={200}
-          rowCount={rowCount}
-          rowHeight={cache.rowHeight}
-          rowRenderer={rowRenderer}
-          scrollToAlignment="start"
-          scrollToIndex={initialScrollIndex}
-          width={width}
-          {...rest}
-        />
-      )}
-    </AutoSizer>
+    <StyledVirtuoso
+      ref={listRef}
+      defaultItemHeight={16}
+      initialTopMostItemIndex={initialScrollIndex}
+      // eslint-disable-next-line react/no-unstable-nested-components
+      itemContent={(index) => {
+        const processedLogLine = processedLogLines[index];
+
+        if (isCollapsedRow(processedLogLine)) {
+          return <CollapsedRow collapsedLines={processedLogLine} />;
+        }
+        const Row = rowRendererMap[logType];
+        return (
+          <Row
+            highlights={highlightRegex}
+            index={index}
+            lineNumber={processedLogLine}
+            wrap={wrap}
+          />
+        );
+      }}
+      totalCount={rowCount}
+    />
   );
+};
+
+const StyledVirtuoso = styled(Virtuoso)`
+  overflow-x: "scroll";
+`;
+
+const rowRendererMap = {
+  [LogTypes.EVERGREEN_TASK_LOGS]: AnsiiRow,
+  [LogTypes.EVERGREEN_TEST_LOGS]: AnsiiRow,
+  [LogTypes.RESMOKE_LOGS]: ResmokeRow,
 };
 
 LogPane.displayName = "LogPane";

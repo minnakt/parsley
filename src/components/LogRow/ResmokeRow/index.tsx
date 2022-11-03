@@ -1,26 +1,31 @@
-import { forwardRef } from "react";
 import BaseRow from "components/LogRow/BaseRow";
-import { BaseRowProps } from "../types";
+import { useLogContext } from "context/LogContext";
 import { isLineInRange } from "../utils";
 
-interface ResmokeRowProps extends BaseRowProps {
+interface ResmokeRowProps {
+  index: number;
+  wrap: boolean;
   lineNumber: number;
+  highlights: RegExp;
 }
 
-const ResmokeRow = forwardRef<any, ResmokeRowProps>((rowProps, ref) => {
-  const { data, listRowProps, lineNumber } = rowProps;
+const ResmokeRow: React.FC<ResmokeRowProps> = ({
+  index,
+  wrap,
+  lineNumber,
+  highlights,
+}) => {
   const {
     getLine,
     getResmokeLineColor,
-    resetRowHeightAtIndex,
     scrollToLine,
     highlightedLine,
     prettyPrint,
     range,
-    searchTerm,
-    wrap,
-    highlights,
-  } = data;
+    searchState,
+  } = useLogContext();
+
+  const { searchTerm } = searchState;
 
   const lineContent = getLine(lineNumber);
   const lineColor = getResmokeLineColor(lineNumber);
@@ -28,14 +33,12 @@ const ResmokeRow = forwardRef<any, ResmokeRowProps>((rowProps, ref) => {
 
   return lineContent ? (
     <BaseRow
-      {...listRowProps}
-      ref={ref}
       data-cy="resmoke-row"
       highlightedLine={highlightedLine}
       highlights={highlights}
+      index={index}
       lineNumber={lineNumber}
       prettyPrint={prettyPrint}
-      resetRowHeightAtIndex={resetRowHeightAtIndex}
       resmokeRowColor={lineColor}
       scrollToLine={scrollToLine}
       searchTerm={inRange ? searchTerm : undefined}
@@ -44,7 +47,7 @@ const ResmokeRow = forwardRef<any, ResmokeRowProps>((rowProps, ref) => {
       {lineContent}
     </BaseRow>
   ) : null;
-});
+};
 
 ResmokeRow.displayName = "ResmokeRow";
 

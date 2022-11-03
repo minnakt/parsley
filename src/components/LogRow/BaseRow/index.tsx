@@ -1,7 +1,6 @@
-import { forwardRef, memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import styled from "@emotion/styled";
 import { palette } from "@leafygreen-ui/palette";
-import { ListRowProps } from "react-virtualized";
 import Highlight from "components/Highlight";
 import Icon from "components/Icon";
 import { QueryParams } from "constants/queryParams";
@@ -14,7 +13,7 @@ import { escapeHtml } from "utils/renderHtml/escapeHtml";
 
 const { yellow, red } = palette;
 
-interface BaseRowProps extends ListRowProps {
+interface BaseRowProps {
   children: string;
   "data-cy"?: string;
   index: number;
@@ -23,7 +22,6 @@ interface BaseRowProps extends ListRowProps {
   lineNumber: number;
   prettyPrint?: boolean;
   highlightedLine?: number;
-  resetRowHeightAtIndex: (index: number) => void;
   scrollToLine: (lineNumber: number) => void;
   searchTerm?: RegExp;
   highlights?: RegExp;
@@ -35,23 +33,19 @@ interface BaseRowProps extends ListRowProps {
  * BaseRow is meant to be used as a wrapper for all rows in the log view.
  * It is responsible for handling the highlighting of the selected line
  */
-const BaseRow = forwardRef<any, BaseRowProps>((props, ref) => {
-  const {
-    children,
-    "data-cy": dataCyText,
-    index,
-    highlightedLine,
-    lineNumber,
-    prettyPrint = false,
-    searchTerm,
-    resmokeRowColor,
-    wrap,
-    resetRowHeightAtIndex,
-    highlights,
-    scrollToLine,
-    ...rest
-  } = props;
-
+const BaseRow: React.FC<BaseRowProps> = ({
+  children,
+  "data-cy": dataCyText,
+  index,
+  highlightedLine,
+  lineNumber,
+  prettyPrint = false,
+  searchTerm,
+  resmokeRowColor,
+  wrap,
+  highlights,
+  scrollToLine,
+}) => {
   const [selectedLine, setSelectedLine] = useQueryParam<number | undefined>(
     QueryParams.SelectedLine,
     undefined
@@ -85,16 +79,10 @@ const BaseRow = forwardRef<any, BaseRowProps>((props, ref) => {
       const newBookmarks = [...bookmarks, lineNumber].sort((a, b) => a - b);
       setBookmarks(newBookmarks);
     }
-
-    if (prettyPrint) {
-      resetRowHeightAtIndex(index);
-    }
   };
 
   return (
     <RowContainer
-      ref={ref}
-      {...rest}
       bookmarked={bookmarked}
       data-cy={`log-row-${lineNumber}`}
       data-highlighted={highlighted}
@@ -122,7 +110,7 @@ const BaseRow = forwardRef<any, BaseRowProps>((props, ref) => {
       </StyledPre>
     </RowContainer>
   );
-});
+};
 
 interface ProcessedBaseRowProps {
   children: string;
@@ -220,7 +208,6 @@ const Index = styled.pre`
 const StyledPre = styled.pre<{
   shouldWrap: boolean;
 }>`
-  overflow-y: hidden;
   margin-top: 0;
   margin-bottom: 0;
   margin-right: ${size.xs};
