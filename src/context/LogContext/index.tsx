@@ -40,6 +40,7 @@ interface LogContextState {
   };
   searchState: SearchState;
 
+  clearAfter: (idx: number) => void;
   clearExpandedLines: () => void;
   clearLogs: () => void;
   collapseLines: (idx: number) => void;
@@ -107,12 +108,7 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
   const matchingLines = useMemo(
     () => getMatchingLines(state.logs, filters, filterLogic),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      stringifiedFilters,
-      stringifiedExpandedLines,
-      state.logs.length,
-      filterLogic,
-    ]
+    [stringifiedFilters, state.logs.length, filterLogic]
   );
 
   useEffect(
@@ -213,6 +209,10 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
       },
       searchState: state.searchState,
 
+      clearAfter: (idx: number) => {
+        cache.clearAfter(idx);
+        listRef.current?.recomputeRowHeights(idx);
+      },
       clearExpandedLines: () => dispatch({ type: "CLEAR_EXPANDED_LINES" }),
       clearLogs: () => dispatch({ type: "CLEAR_LOGS" }),
       collapseLines: (idx: number) => dispatch({ type: "COLLAPSE_LINES", idx }),
@@ -265,6 +265,7 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
       processedLogLines,
       searchResults,
       upperRange,
+
       dispatch,
       getLine,
       getResmokeLineColor,

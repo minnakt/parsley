@@ -1,10 +1,7 @@
 import styled from "@emotion/styled";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import {
-  CellMeasurer,
-  CellMeasurerCache,
-  ListRowRenderer,
-} from "react-virtualized";
+import { CellMeasurer, ListRowRenderer } from "react-virtualized";
+import ModifiedCellMeasurerCache from "components/ModifiedCellMeasurerCache";
 import LogPane from ".";
 
 export default {
@@ -24,7 +21,7 @@ const Template: ComponentStory<typeof LogPane> = (args) => (
   </Container>
 );
 
-const cache = new CellMeasurerCache({
+const cache = new ModifiedCellMeasurerCache({
   fixedWidth: true,
   minHeight: 16,
 });

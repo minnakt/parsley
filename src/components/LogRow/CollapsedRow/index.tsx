@@ -1,4 +1,4 @@
-import { forwardRef, useTransition } from "react";
+import { forwardRef } from "react";
 import styled from "@emotion/styled";
 import Button from "@leafygreen-ui/button";
 import { palette } from "@leafygreen-ui/palette";
@@ -6,6 +6,7 @@ import { Overline } from "@leafygreen-ui/typography";
 import { useLogWindowAnalytics } from "analytics";
 import Icon from "components/Icon";
 import { size } from "constants/tokens";
+import { useLogContext } from "context/LogContext";
 import { OverlineType } from "types/leafygreen";
 import { BaseRowProps } from "../types";
 
@@ -20,6 +21,9 @@ interface CollapsedRowProps extends BaseRowProps {
 const CollapsedRow = forwardRef<any, CollapsedRowProps>((props, ref) => {
   const { collapsedLines, data, listRowProps } = props;
   const { expandLines } = data;
+  const { index } = listRowProps;
+
+  const { clearAfter } = useLogContext();
 
   const numCollapsed = collapsedLines.length;
   const start = collapsedLines[0];
@@ -29,23 +33,22 @@ const CollapsedRow = forwardRef<any, CollapsedRowProps>((props, ref) => {
     numCollapsed !== 1 ? `${numCollapsed} lines skipped` : "1 line skipped";
   const disableExpandFive = 2 * SKIP_NUMBER > numCollapsed;
 
-  const [, startTransition] = useTransition();
   const { sendEvent } = useLogWindowAnalytics();
 
   const expandFive = () => {
-    startTransition(() => {
-      expandLines([
-        [start, start + (SKIP_NUMBER - 1)],
-        [end - (SKIP_NUMBER - 1), end],
-      ]);
-    });
+    expandLines([
+      [start, start + (SKIP_NUMBER - 1)],
+      [end - (SKIP_NUMBER - 1), end],
+    ]);
+    // There is a lag between when the processedLines have changed. We must wait for the row sizes to be updated correctly.
+    setTimeout(() => clearAfter(index), 200);
     sendEvent({ name: "Expanded Lines", lineCount: 5, option: "Five" });
   };
 
   const expandAll = () => {
-    startTransition(() => {
-      expandLines([[start, end]]);
-    });
+    expandLines([[start, end]]);
+    // There is a lag between when the processedLines have changed. We must wait for the row sizes to be updated correctly.
+    setTimeout(() => clearAfter(index), 200);
     sendEvent({
       name: "Expanded Lines",
       lineCount: numCollapsed,

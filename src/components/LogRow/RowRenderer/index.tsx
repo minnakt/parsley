@@ -1,9 +1,5 @@
-import {
-  CellMeasurer,
-  CellMeasurerCache,
-  ListRowProps,
-  ListRowRenderer,
-} from "react-virtualized";
+import { CellMeasurer, ListRowProps, ListRowRenderer } from "react-virtualized";
+import ModifiedCellMeasurerCache from "components/ModifiedCellMeasurerCache";
 import { LogTypes } from "constants/enums";
 import { ProcessedLogLines } from "types/logs";
 import { isCollapsedRow } from "utils/collapsedRow";
@@ -61,7 +57,7 @@ const rowRendererMap = {
   [LogTypes.RESMOKE_LOGS]: ResmokeRow,
 };
 
-const cache = new CellMeasurerCache({
+const cache = new ModifiedCellMeasurerCache({
   fixedWidth: true,
   defaultHeight: 16,
 });
